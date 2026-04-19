@@ -1,4 +1,4 @@
-# 🧪 DummyJSON API Testing – Postman Collection
+#  DummyJSON API Testing – Postman Collection
 
 A comprehensive API test suite built with **Postman** for the [DummyJSON](https://dummyjson.com/) REST API. This collection covers functional, validation, and edge-case testing across multiple resource modules using JavaScript test scripts.
 
