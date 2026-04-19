@@ -1,0 +1,2043 @@
+{
+  "info": {
+    "_postman_id": "ce0ae536-f060-4212-a7ba-9b50a4786662",
+    "name": "Dummy JSON API testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45410172",
+    "_collection_link": "https://go.postman.co/collection/45410172-ce0ae536-f060-4212-a7ba-9b50a4786662?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "product API",
+      "item": [
+        {
+          "name": "Valid paths",
+          "item": [
+            {
+              "name": "Get All Products",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating response body has products which is not an empty array",
+                      "pm.test(\"Products array exists\", () => {",
+                      "    pm.expect(response).to.have.property('products');",
+                      "    pm.expect(response.products).to.be.an('array').that.is.not.empty",
+                      "});",
+                      "",
+                      "",
+                      "",
+                      "//check each product has required fields",
+                      "",
+                      "pm.test(\"Each product has required fields\", () => {",
+                      "    response.products.forEach(product => {",
+                      "",
+                      "        pm.expect(product).to.have.property('id');",
+                      "        pm.expect(product.id).to.be.a('number');",
+                      "",
+                      "        pm.expect(product).to.have.property('title');",
+                      "        pm.expect(product.title).to.be.a('string');",
+                      "",
+                      "        pm.expect(product).to.have.property('price');",
+                      "        pm.expect(product.price).to.be.a('number').and.to.be.above(0)",
+                      "    })",
+                      "});",
+                      "",
+                      "//Validation that each product has a valid rating between 0 and 5.",
+                      "pm.test(\"Each product has a valid rating\", () => {",
+                      "    response.products.forEach(product => {",
+                      "        if (product.rating !== undefined) {",
+                      "            pm.expect(product.rating).to.be.within(0, 5)",
+                      "        }",
+                      "    })",
+                      "})",
+                      "",
+                      "//Validating each product ID is unique",
+                      "pm.test(\"Each product id is unique\", () => {",
+                      "    const ids = response.products.map(p => p.id);",
+                      "    const uniqueIds = new Set(ids);",
+                      "    pm.expect(ids.length).to.eql(uniqueIds.size);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}products",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "query": [
+                    {
+                      "key": "select",
+                      "value": "title,description,price",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": true
+                    },
+                    {
+                      "key": "skip",
+                      "value": "4",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Single product",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "",
+                      "//Validating correct product is returned",
+                      "pm.test(\"Product ID matches requested ID\", () => ",
+                      "{",
+                      "    const productId = Number(pm.request.url.toString().split(\"/\").pop());",
+                      "    pm.expect(response.id).to.equal(productId);",
+                      "});",
+                      "",
+                      "// Validating response has a valid product structure",
+                      "pm.test(\"Response has valid product structure\", () => {",
+                      "",
+                      "    pm.expect(response).to.have.property(\"id\");",
+                      "    pm.expect(response.id).to.be.a(\"number\").and.to.be.above(0);",
+                      "",
+                      "    pm.expect(response).to.have.property(\"title\");",
+                      "    pm.expect(response.title).to.be.a(\"string\").that.is.not.empty;",
+                      "",
+                      "    pm.expect(response).to.have.property(\"price\");",
+                      "    pm.expect(response.price).to.be.a(\"number\").and.to.be.above(0);",
+                      "",
+                      "    pm.expect(response).to.have.property(\"category\");",
+                      "    pm.expect(response.category).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "// Validating the product has a valid rating",
+                      "pm.test(\"Product has valid rating\", () => {",
+                      "    pm.expect(response).to.have.property(\"rating\");",
+                      "    pm.expect(response.rating).to.be.a(\"number\").and.to.be.within(0, 5);",
+                      "});",
+                      "",
+                      "//Validating product stock is non negative",
+                      "pm.test(\"Product stock is non negative\", () => {",
+                      "    pm.expect(response).to.have.property(\"stock\");",
+                      "        pm.expect(response.stock).to.be.a(\"number\").and.to.be.at.least(0);",
+                      "    ",
+                      "})",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}/products/1",
+                  "host": [
+                    "{{DbaseURL}}"
+                  ],
+                  "path": [
+                    "products",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Products",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating tbhe respo nse body structure",
+                      "pm.test(\"Response body has the valid structure\", () => {",
+                      "    pm.expect(response).to.have.property('products').that.is.an('array');",
+                      "    pm.expect(response).to.have.property('limit').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('skip').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('total').that.is.a('number');",
+                      "});",
+                      "",
+                      "//Validating the the response body limits the product list to 10 items and skips 4 products",
+                      "pm.test(\"Response respects limit=10 and skip=4\", () => {",
+                      "    pm.expect(response.products.length).to.equal(10);",
+                      "    pm.expect(response.skip).to.equal(4)",
+                      "})",
+                      "",
+                      "//Validating that response body actually limit to 10 products",
+                      "pm.test(\"Returned products respect total count\", () => {",
+                      "    pm.expect(response.products.length).to.be.most(response.limit)",
+                      "})",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}products?limit=10&skip=4",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "query": [
+                    {
+                      "key": "select",
+                      "value": "title,description,price",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "skip",
+                      "value": "4"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Product",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 201\",  ()=> {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();    ",
+                      "const requestBody = JSON.parse(pm.request.body.raw);",
+                      "",
+                      "//Validating the response body",
+                      "pm.test(\"Response body contains created product fields\", () => ",
+                      "{",
+                      "    pm.expect(response).to.have.property('id');",
+                      "    pm.expect(response.id).to.be.a('number').and.to.be.above(0);",
+                      "",
+                      "    pm.expect(response).to.have.property('title');",
+                      "    pm.expect(response.title).to.be.a('string').and.to.not.be.empty;",
+                      "",
+                      "    pm.expect(response).to.have.property('price');  ",
+                      "  pm.expect(response.price).to.be.a('number').and.to.be.above(0); ",
+                      "",
+                      "})",
+                      " //Validating that the response body contains the correct data.",
+                      " pm.test(\"Created product has the correct requested data\", () => ",
+                      " {",
+                      "    pm.expect(response.title).to.equal(requestBody.title);",
+                      "    pm.expect(response.price).to.equal(requestBody.price)",
+                      " })",
+                      "",
+                      " //Validating the price is above 0",
+                      " pm.test(\"Price is above 0\", () =>  ",
+                      " {",
+                      "    pm.expect(response.price).to.be.above(0);   ",
+                      " })"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \n    \"title\": \"Test Product\",\n    \"price\": 100\n\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}products/add",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "path": [
+                    "add"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Register Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "const response = pm.response.json();",
+                      "",
+                      "",
+                      "//Validating the access",
+                      "pm.test(\"access token is created\", () => {",
+                      "    pm.expect(response).to.have.property('accessToken')",
+                      "    pm.expect(response.accessToken).to.be.a(\"string\").that.is.not.empty;",
+                      "})",
+                      "",
+                      "//validating referesh token is created and not null",
+                      "pm.test(\"refresh token is created\", () => {",
+                      "    pm.expect(response).to.have.property('refreshToken')",
+                      "    pm.expect(response.refreshToken).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "//Validating the User details",
+                      "pm.test(\"User details are valid\", () => {",
+                      "    pm.expect(response).to.have.property(\"id\");",
+                      "    pm.expect(response.id).to.be.a(\"number\").to.be.above(0)",
+                      "",
+                      "    pm.expect(response).to.have.property(\"username\")",
+                      "    pm.expect(response.username).to.be.a(\"string\").that.is.not.empty",
+                      "",
+                      "    pm.expect(response).to.have.property(\"email\")",
+                      "    pm.expect(response.email).to.be.a(\"string\").to.include(\"@\")",
+                      "",
+                      "    pm.expect(response).to.have.property(\"firstName\")",
+                      "    pm.expect(response.firstName).to.be.a(\"string\").that.is.not.empty",
+                      "    ",
+                      "    pm.expect(response).to.have.property(\"lastName\")",
+                      "    pm.expect(response.lastName).to.be.a(\"string\").that.is.not.empty",
+                      "",
+                      "})",
+                      "",
+                      "//Validating Request body username to match response username",
+                      "pm.test(\"Generated username has the correct requested Username\", () => {",
+                      "    const requestBody = JSON.parse(pm.request.body.raw);",
+                      "    pm.expect(response.username).to.equal(requestBody.username);",
+                      "});",
+                      "",
+                      "pm.collectionVariables.set(\"accessToken\", response.accessToken);",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"emilys\",\n    \"password\": \"emilyspass\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}/auth/login",
+                  "host": [
+                    "{{DbaseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Products Categories",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating that repsonse is amn array",
+                      "pm.test(\"Response body is an array\", () => {",
+                      "    pm.expect(response).to.be.an('array');",
+                      "});",
+                      "",
+                      "//Validating that the response length is above 0",
+                      "pm.test(\"response body is not empty\", () => {",
+                      "",
+                      "    pm.expect(response.length).to.be.above(0);",
+                      "});",
+                      "",
+                      "//Validating the repsonse body for respective fields and their types.",
+                      "pm.test(\"Response body contains respective fields\", () => {",
+                      "    response.forEach(item => {",
+                      "        pm.expect(item).to.have.property('slug');",
+                      "        pm.expect(item.slug).to.be.a('string').that.is.not.empty;",
+                      "",
+                      "        pm.expect(item).to.have.property('name');",
+                      "        pm.expect(item.name).to.be.a('string').that.is.not.empty;;",
+                      "",
+                      "",
+                      "        pm.expect(item).to.have.property('url');",
+                      "        pm.expect(item.url).to.be.a('string').that.is.not.empty;",
+                      "        pm.expect(item.url).to.include(\"https://\");",
+                      "    })",
+                      "",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}products/categories",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All product List",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "//Validating is array",
+                      "pm.test(\"Response is an array\",  ()=>",
+                      " {",
+                      "pm.expect(response).to.be.an('array');",
+                      " })",
+                      " ",
+                      " //Validating if array is not empty and contains only string characters.",
+                      "pm.test(\"Array is not empty\",()=>{",
+                      "pm.expect(response.length).to.be.above(0);",
+                      "});",
+                      "",
+                      "//Validating if array contains only string characters.",
+                      "pm.test(\"array is string characters only\",()=>{",
+                      "    response.forEach(item =>",
+                      "    {",
+                      "        pm.expect(item).to.be.a('string');",
+                      "",
+                      "        pm.expect(item.trim().length).to.be.above(0);",
+                      "",
+                      "    })",
+                      "})",
+                      "",
+                      "// Unique validation 🔥",
+                      "pm.test(\"Categories are unique\", () => {",
+                      "    const unique = new Set(response);",
+                      "    pm.expect(response.length).to.eql(unique.size);",
+                      "});",
+                      "",
+                      "/*pm.test(\"Negative test (intentional failure)\",()=>{",
+                      "    response.forEach(item =>",
+                      "    {",
+                      "        pm.expect(item).to.not.be.a('string');",
+                      "    })",
+                      "});*/"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}products/category-list",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "path": [
+                    "category-list"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Product Copy",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\",  ()=>",
+                      " {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "const requestBody = JSON.parse(pm.request.body.raw);",
+                      "",
+                      "//Validating if the product id match the request URL",
+                      " pm.test(\"Product id match the request URL\", () => ",
+                      " {",
+                      "    const prodId = Number(pm.request.url.path[1])",
+                      "    pm.expect(response.id).to.equal(prodId)   ",
+                      " })",
+                      "",
+                      "",
+                      "//Validating product has expected  fields",
+                      "pm.test(\"Product has expected fields\", ()=>",
+                      " {",
+                      "pm.expect(response).to.have.property('id').that.is.a('number')",
+                      "pm.expect(response).to.have.property('title').that.is.a('string')",
+                      "pm.expect(response).to.have.property('price').that.is.a('number')",
+                      "pm.expect(response).to.have.property('discountPercentage').that.is.a('number')",
+                      "pm.expect(response).to.have.property('stock').that.is.a('number')",
+                      "pm.expect(response).to.have.property('rating').that.is.a('number')",
+                      "pm.expect(response).to.have.property('description').that.is.a('string')",
+                      "pm.expect(response).to.have.property('brand').that.is.a('string')",
+                      "pm.expect(response).to.have.property('category').that.is.a('string')",
+                      "",
+                      " })",
+                      "",
+                      " //Validating if the product price  match the request body",
+                      " pm.test(\"Product expected price is updated correctly\", () => ",
+                      " {",
+                      "    pm.expect(response.price).to.equal(requestBody.price)",
+                      "    ",
+                      " })",
+                      "",
+                      " //Validating product stock is updated correctly",
+                      " pm.test(\"Product expected stock is updated correctly\", () =>   {",
+                      "",
+                      "    pm.expect(response.stock).to.equal(requestBody.stock)   ",
+                      " })",
+                      "",
+                      "//Validating product price is above 0",
+                      "pm.test(\"Product price is above 0\", () =>   ",
+                      "{",
+                      "pm.expect(response.price).to.be.above(0)",
+                      "})",
+                      "",
+                      "//Validating stock in atleast 0",
+                      "pm.test(\"Product stock is atleast 0\", () =>       ",
+                      "{",
+                      "    pm.expect(response.stock).to.be.at.least(0)",
+                      "})",
+                      "",
+                      "//Validating rating is between 0,5",
+                      "pm.test(\"Product rating is between 0 and 5\", () =>          ",
+                      "{",
+                      "    pm.expect(response.rating).to.be.within(0, 5)",
+                      "})",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"price\": 16.99,\n    \"stock\": 20\n    \n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}products/5",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "path": [
+                    "5"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete a product",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "// Validate response has id",
+                      "pm.test(\"Response contains product id\", () => {",
+                      "    pm.expect(response).to.have.property('id').that.is.a('number')",
+                      "});",
+                      "",
+                      "// Validate ID matches request",
+                      "pm.test(\"Deleted product ID matches request ID\", () => {",
+                      "    const productId = Number(pm.request.url.path[1]);",
+                      "    pm.expect(response.id).to.equal(productId);",
+                      "});",
+                      "",
+                      "// Validating that repsonse has isDeleted field and it is true.",
+                      "pm.test(\"Response contains deletion flag\", () => {",
+                      "    pm.expect(response).to.have.property('isDeleted');",
+                      "    pm.expect(response.isDeleted).to.be.true;",
+                      "});",
+                      "",
+                      "//validate deletedOn field",
+                      "pm.test(\"DeletedOn field is present and in correct format\", () => ",
+                      "{",
+                      "    pm.expect(response).to.have.property('deletedOn')",
+                      "    pm.expect(response.deletedOn).to.be.a('string');",
+                      "})"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}products/3",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "path": [
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Invalid Paths",
+          "item": [
+            {
+              "name": "Invalid Credentials",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 400\", ()=> {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating the product structure is valid",
+                      "pm.test(\"Response structure is valid\",  ()=> {",
+                      "    pm.expect(response).to.have.property('message')",
+                      "     pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "//Validating that the eroor message is displayed",
+                      "pm.test(\"Error message for missing username and password\",  ()=> ",
+                      "{   ",
+                      "    pm.expect(response.message).to.equal(\"Invalid credentials\")",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"wqeafsdgn\",\n    \"password\": \"dsv\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}/auth/login",
+                  "host": [
+                    "{{DbaseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Without credentials",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 400\", ()=> {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating the product structure is valid",
+                      "pm.test(\"Response structure is valid\",  ()=> {",
+                      "     ",
+                      "    pm.expect(response).to.have.property('message')",
+                      "    pm.expect(response.message).to.be.a('string').that.is.not.empty;",
+                      "});",
+                      "",
+                      "//Validating that the eroor message is displayed",
+                      "pm.test(\"Error message for missing username and password\",  ()=> ",
+                      "{   ",
+                      "    pm.expect(response.message).to.equal(\"Username and password required\")",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}/auth/login",
+                  "host": [
+                    "{{DbaseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Invalid product id",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 404\", () => {",
+                      "    pm.response.to.have.status(404);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating response message is a string and not empty.",
+                      "pm.test(\"Response message is valid\", () => {",
+                      "    ",
+                      "    pm.expect(response).to.have.property(\"message\")",
+                      "    pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "//Validating the expected error message is displayed.",
+                      "pm.test(\"expected error message is displayed\", () => {",
+                      "",
+                      "    pm.expect(response.message).to.eql(\"Product with id '195' not found\");",
+                      "});",
+                      "",
+                      "//Validating the error message contains the id '195' in the response message.",
+                      "pm.test(\"error message contains id '195'\", () => {",
+                      "",
+                      "pm.expect(response.message).to.include(\"195\");",
+                      "",
+                      "})",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}/products/195",
+                  "host": [
+                    "{{DbaseURL}}"
+                  ],
+                  "path": [
+                    "products",
+                    "195"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Invalid Skip Value -Search products",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 400\", () => {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating response message is a string and not empty.",
+                      "pm.test(\"Response message is valid\", () => {",
+                      "    ",
+                      "    pm.expect(response).to.have.property(\"message\")",
+                      "    pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "//Validating the expected error message is displayed.",
+                      "pm.test(\"expected error message is displayed\", () => {",
+                      "",
+                      "    pm.expect(response.message).to.eql(\"Invalid 'skip' - must be a number\");",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}products?skip=abc",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "query": [
+                    {
+                      "key": "select",
+                      "value": "title,description,price",
+                      "disabled": true
+                    },
+                    {
+                      "key": "skip",
+                      "value": "abc"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "-",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Invalid Limit Value -Search products",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 400\", () => {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating response message is a string and not empty.",
+                      "pm.test(\"Response message is valid\", () => {",
+                      "    ",
+                      "    pm.expect(response).to.have.property(\"message\")",
+                      "    pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "//Validating the expected error message is displayed.",
+                      "pm.test(\"expected error message is displayed\", () => {",
+                      "",
+                      "    pm.expect(response.message).to.eql(\"Invalid 'limit' - must be a number\")",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}products?skip=10&limit=-",
+                  "host": [
+                    "{{DbaseURL}}products"
+                  ],
+                  "query": [
+                    {
+                      "key": "select",
+                      "value": "title,description,price",
+                      "disabled": true
+                    },
+                    {
+                      "key": "skip",
+                      "value": "10"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "-"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Carts",
+      "item": [
+        {
+          "name": "Valid Paths",
+          "item": [
+            {
+              "name": "Get All Carts",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating that response is an array of carts.Cart Structure",
+                      "pm.test(\"Response contain carts array\", () => {",
+                      "",
+                      "    pm.expect(response).to.have.property('carts');",
+                      "    pm.expect(response.carts).to.be.an('array');",
+                      "",
+                      "});",
+                      "",
+                      "//Validating cart is not empty",
+                      "pm.test(\"Carts array contains at least one cart\", () => {",
+                      "    pm.expect(response.carts.length).to.be.above(0);",
+                      "",
+                      "});",
+                      "",
+                      "// Validating Cart Has expected fields",
+                      "pm.test(\"Each cart has expected fields\", () => {",
+                      "    response.carts.forEach(cart => {",
+                      "        pm.expect(cart).to.have.property('id').that.is.a('number');",
+                      "        pm.expect(cart).to.have.property('products').that.is.an('array').that.is.not.empty;",
+                      "        pm.expect(cart).to.have.property('total').that.is.a('number');",
+                      "        pm.expect(cart).to.have.property('discountedTotal').that.is.a('number');",
+                      "        pm.expect(cart).to.have.property('totalProducts').that.is.a('number');",
+                      "        pm.expect(cart).to.have.property('totalQuantity').that.is.a('number');",
+                      "    });",
+                      "})",
+                      "",
+                      "//Validating product fields in a cart.  along with data types",
+                      "pm.test(\"Each product in a cart has  required fields\", () => {",
+                      "",
+                      "    response.carts.forEach(cart => {",
+                      "        cart.products.forEach(product => {",
+                      "            pm.expect(product).to.have.property('id');",
+                      "            pm.expect(product.id).to.be.a('number')",
+                      "",
+                      "            pm.expect(product).to.have.property('title')",
+                      "            pm.expect(product.title).to.be.a(\"string\")",
+                      "            ",
+                      "            pm.expect(product).to.have.property('price')",
+                      "            pm.expect(product.price).to.be.a('number')",
+                      "",
+                      "            pm.expect(product).to.have.property('quantity')",
+                      "            pm.expect(product.quantity).to.be.a('number')",
+                      "",
+                      "            pm.expect(product).to.have.property('total')",
+                      "            pm.expect(product.total).to.be.a('number')  ",
+                      "",
+                      "            pm.expect(product).to.have.property('discountPercentage')",
+                      "            pm.expect(product.discountPercentage).to.be.a('number')",
+                      "",
+                      "            pm.expect(product).to.have.property('discountedTotal' )",
+                      "            pm.expect(product.discountedTotal).to.be.a('number')",
+                      "",
+                      "",
+                      "        })",
+                      "    })",
+                      "});",
+                      "    ",
+                      "//Validating cart total is equal to all the product totals in the cart",
+                      "pm.test(\"Cart total equals sum of product totals\", () => {",
+                      "response.carts.forEach(cart =>{",
+                      "    let sum = 0;",
+                      "",
+                      "    cart.products.forEach(product =>",
+                      "    {",
+                      "        sum += product.total;",
+                      "    })",
+                      "    pm.expect(cart.total).to.closeTo(sum,0.01);",
+                      "})",
+                      "})",
+                      "",
+                      "//Validating product total = price * quantity",
+                      "pm.test(\"Product total equals price * quantity\", () => ",
+                      "{",
+                      "    response.carts.forEach(cart=>{",
+                      "      cart.products.forEach(product =>{",
+                      "        const expectedTotal = product.price * product.quantity",
+                      "        pm.expect(product.total).to.be.closeTo(expectedTotal,0.01)",
+                      "      })",
+                      "    })",
+                      "})",
+                      "",
+                      "//Validating the discountedTotal is equal to the sum of  products discountedTotal",
+                      "pm.test(\"Cart discountedTotal equals sum of product discountedTotal\", () => {",
+                      "response.carts.forEach(cart =>{",
+                      "    let sum = 0;",
+                      "",
+                      "    cart.products.forEach(product =>",
+                      "    {",
+                      "        sum += product.discountedTotal;",
+                      "    })",
+                      "    pm.expect(cart.discountedTotal).to.closeTo(sum,0.01);",
+                      "})",
+                      "})",
+                      "",
+                      "//Validating discountedTotal of the cart is less than total in the cart",
+                      "pm.test(\"Cart discountedTotal is less than total\", () => ",
+                      "{",
+                      "    response.carts.forEach(cart =>{",
+                      "        pm.expect(cart.discountedTotal).to.be.below(cart.total)",
+                      "    })",
+                      "})",
+                      "",
+                      "//Validating the totalProducts = number of products in the cart",
+                      "pm.test(\"Cart total products equals number of products in the cart\", () => ",
+                      "{",
+                      "    response.carts.forEach(cart =>{",
+                      "        pm.expect(cart.totalProducts).to.equal(cart.products.length) //",
+                      "})",
+                      "})",
+                      "",
+                      "//Validating the totalQuantity is equal to the sum of  products quantity",
+                      "pm.test(\"Cart total quantity equals sum of product quantities\", () => {",
+                      "    response.carts.forEach(cart =>{",
+                      "        let sum =0",
+                      "",
+                      "    cart.products.forEach(product =>{",
+                      "        sum += product.quantity;",
+                      "    })",
+                      "pm.expect(cart.totalQuantity).to.equal(sum) ",
+                      "    })",
+                      "})",
+                      "",
+                      "//metadat validation",
+                      "pm.test(\"Response metadata is valid\", () => {",
+                      "    pm.expect(response).to.have.property('total').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('skip').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('limit').that.is.a('number');",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}carts",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get single Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating that requested cartID is displayed",
+                      "pm.test(\"Cart ID is matches the request ID\", () => {",
+                      "    const cartid = Number(pm.request.url.path[1])",
+                      "",
+                      "    pm.expect(response).to.have.property('id')",
+                      "    pm.expect(response.id).to.equal(cartid)",
+                      "",
+                      "})",
+                      "",
+                      "// Validating Cart Has expected  fields",
+                      "pm.test(\"Each cart has expected fields\", () => {",
+                      "    pm.expect(response).to.have.property('id').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('products').that.is.an('array').that.is.not.empty;",
+                      "    pm.expect(response).to.have.property('total').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('discountedTotal').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('totalProducts').that.is.a('number');",
+                      "    pm.expect(response).to.have.property('totalQuantity').that.is.a('number');",
+                      "});",
+                      "",
+                      "//Validating the products contains expected keys",
+                      "pm.test(\"Products contain required keys\", () => {",
+                      "",
+                      "    response.products.forEach(product => {",
+                      "        pm.expect(product).to.include.all.keys",
+                      "            (",
+                      "                'id',",
+                      "                'title',",
+                      "                'price',",
+                      "                'quantity',",
+                      "                'total',",
+                      "                'discountPercentage',",
+                      "                'discountedTotal',",
+                      "                'thumbnail'",
+                      "            )",
+                      "",
+                      "    })",
+                      "})",
+                      "",
+                      "//Validating product fields have correct datatypes.",
+                      "pm.test(\"Product fields have correct data types\", () => {",
+                      "  response.products.forEach(product => {",
+                      "        pm.expect(product.id).to.be.a('number');",
+                      "        pm.expect(product.title).to.be.a(\"string\");",
+                      "        pm.expect(product.price).to.be.a('number');",
+                      "        pm.expect(product.quantity).to.be.a('number');",
+                      "        pm.expect(product.total).to.be.a('number');",
+                      "        pm.expect(product.discountPercentage).to.be.a('number');",
+                      "        pm.expect(product.discountedTotal).to.be.a('number');",
+                      "",
+                      "        // Logic checks",
+                      "        ",
+                      "    });",
+                      "});",
+                      "",
+                      "",
+                      "//Validating cart total is equal to product total",
+                      "pm.test(\"Cart total is equal to product total\", () => {",
+                      "    let total = 0;",
+                      "    response.products.forEach(product => {",
+                      "",
+                      "        total += product.total",
+                      "    })",
+                      "        pm.expect(response.total).to.closeTo(total, 0.01)",
+                      "",
+                      "})",
+                      "",
+                      "//Validating product total = price * quantity",
+                      "pm.test(\"Product total equals price * quantity\", () => {",
+                      "response.products.forEach(product =>{",
+                      "    const expectedTotal = product.price * product.quantity",
+                      "pm.expect(product.total).to.be.closeTo(expectedTotal, 0.01)",
+                      "})",
+                      "})",
+                      "",
+                      "//Validating cart discountedtotal is equal  sum of product discountedtotal",
+                      "pm.test(\"Cart discountedTotal is calculated correctly\", () => {",
+                      "    let total = 0;",
+                      "    response.products.forEach(product => {",
+                      "",
+                      "        total += product.discountedTotal",
+                      "",
+                      "    })",
+                      "    pm.expect(response.discountedTotal).to.closeTo(total, 0.01)",
+                      "",
+                      "})",
+                      "",
+                      "//Validating the cart total quantity of equal to sum products in the cart",
+                      "pm.test(\"Total quantity of products is correct\", () => {",
+                      "    let total = 0;",
+                      "    response.products.forEach(product => {",
+                      "        total += product.quantity",
+                      "    })",
+                      "    pm.expect(response.totalQuantity).to.equal(total)",
+                      "})",
+                      "",
+                      "//Validating discountedTotal is lessthan total",
+                      "pm.test(\"Discounted total is less than total\", () => {",
+                      "    pm.expect(response.discountedTotal).to.be.below(response.total)",
+                      "}); ",
+                      "",
+                      "//validating totalProducts is equal to products array length",
+                      "pm.test(\"Total products is equal to products array length\", () => {",
+                      "        pm.expect(response.totalProducts).to.equal(response.products.length)",
+                      "    })"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{DbaseURL}}carts/1",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get cart by User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "})",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "///Validating that requested cartID is displayed",
+                      "pm.test(\"Cart ID is matches the request ID\", () => ",
+                      "{",
+                      "    response.carts.forEach(cart =>",
+                      "    {",
+                      "",
+                      "   const userId = Number(pm.request.url.toString().split(\"/\").pop());",
+                      " ",
+                      "    pm.expect(cart.userId).to.equal(userId)",
+                      "})",
+                      "})",
+                      "",
+                      "// cart array is not empty",
+                      "pm.test(\"Cart Array is not empty\", () => {",
+                      "    pm.expect(response).to.have.property('carts')",
+                      "    pm.expect(response.carts).to.be.an('array').that.is.not.empty",
+                      "",
+                      "})",
+                      "",
+                      "//Validating products array in the cart is not empty",
+                      "pm.test(\"Products Array is not empty\", () => ",
+                      "{",
+                      "   response.carts.forEach(cart =>",
+                      "   {",
+                      "   pm.expect(cart).to.have.property('products')",
+                      "    pm.expect(cart.products).to.be.an('array').that.is.not.empty",
+                      "   })",
+                      "})",
+                      "",
+                      "//Validating product total equals to price*quantity(for Each product in each cart)",
+                      "pm.test(\"Each producttotal equals price*quantity\", () => {",
+                      "",
+                      "    //let total = 0;",
+                      "    response.carts.forEach(cart => {",
+                      "",
+                      "        cart.products.forEach(product => {",
+                      "",
+                      "            const expectedTotal = product.price * product.quantity;",
+                      "            pm.expect(product.total).to.be.closeTo(expectedTotal, 0.01);",
+                      "        })",
+                      "    })",
+                      "})",
+                      "",
+                      "//Each product discountedTotal is less than product Total(for Each product in each cart))",
+                      "pm.test(\"Each product discountedTotal is less than product Total\", () => ",
+                      "{",
+                      "    response.carts.forEach(cart => {",
+                      "",
+                      "        cart.products.forEach(product => ",
+                      "        {",
+                      "            pm.expect(product.discountedTotal).to.be.below(product.total);",
+                      "",
+                      "        })",
+                      "    })",
+                      "})",
+                      "",
+                      "",
+                      "//Validating that cart discounted total is less than cart total.(for Each Cart)  ",
+                      "pm.test(\"Cart Discounted Total is less than Cart Total \", () => {",
+                      "    response.carts.forEach(cart => {",
+                      "        pm.expect(cart.discountedTotal).to.be.below(cart.total);",
+                      "    })",
+                      "})",
+                      "",
+                      "//Validating cart totalQuantity is equal to sum of all product quantity",
+                      "pm.test(\"Cart totalQuantity is equal to sum of all product quantity\", () => {",
+                      "    response.carts.forEach(cart => {",
+                      "        let productQty = 0",
+                      "",
+                      "        cart.products.forEach(product => {",
+                      "            productQty = productQty + product.quantity",
+                      "        })",
+                      "        pm.expect(cart.totalQuantity).to.equal(productQty)",
+                      "    })",
+                      "})"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/user/25",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "user",
+                    "25"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Add a new Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 201\",  ()=>",
+                      " {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "//Validating response body userId matches the userID in request body",
+                      "pm.test(\"Response body has valid user id\",()=>",
+                      "{",
+                      "    const requestBody = JSON.parse(pm.request.body.raw)   // Assuming userId is sent as form data",
+                      "    pm.expect(response).to.have.property('userId');",
+                      "    pm.expect(response.userId).to.equal(requestBody.userId)",
+                      "})",
+                      "",
+                      "//Validating Response body has id",
+                      "pm.test(\"Response body has valid expected fields\",()=>",
+                      "{",
+                      "",
+                      " pm.expect(response).to.have.property('id').that.is.a('number');",
+                      "",
+                      "})",
+                      "",
+                      "//validating products array is not empty and is an array",
+                      "pm.test(\"Response body has valid products array\",()=>",
+                      "{",
+                      " pm.expect(response).to.have.property('products').that.is.an('array');",
+                      " pm.expect(response.products.length).to.be.above(0)",
+                      "",
+                      "})",
+                      "",
+                      "//Validating product has required fields",
+                      "pm.test(\"Each product has required fields\",()=>",
+                      "{",
+                      "response.products.forEach(product =>",
+                      "{",
+                      "pm.expect(product).to.have.property('id').that.is.a('number')",
+                      "pm.expect(product).to.have.property('title').that.is.a('string')",
+                      "pm.expect(product).to.have.property('price').that.is.a('number')",
+                      "pm.expect(product).to.have.property('quantity').that.is.a('number')",
+                      "pm.expect(product).to.have.property('total').that.is.a('number')",
+                      "pm.expect(product).to.have.property('discountPercentage').that.is.a('number')",
+                      "pm.expect(product).to.have.property('discountedPrice').that.is.a('number')",
+                      "",
+                      "})",
+                      "})",
+                      "",
+                      "// Cart total = sum of product totals ",
+                      "pm.test(\"Cart total equals sum of product totals\", () => {",
+                      "    let sum = 0;",
+                      "",
+                      "    response.products.forEach(product => {",
+                      "        sum += product.total;",
+                      "    });",
+                      "",
+                      "    pm.expect(response.total).to.be.closeTo(sum, 0.01);",
+                      "});",
+                      "",
+                      "//validating product total = price*quantity",
+                      "pm.test(\"Product total equals price * quantity\", () => ",
+                      "{",
+                      "response.products.forEach(product =>",
+                      "{",
+                      "    const expectedTotal = product.price * product.quantity",
+                      "pm.expect(product.total).to.closeTo(expectedTotal,0.01)",
+                      "})",
+                      "})",
+                      "",
+                      "// discountedTotal is less than  Total (Whole Cart)",
+                      "pm.test(\" product discountedTotal is less than product Total\", () => ",
+                      "{",
+                      "",
+                      "      pm.expect(response.discountedTotal).to.be.below(response.total);",
+                      "})",
+                      "",
+                      "//Validating that the discountedPrice total is less than product total.(Each Product)    ",
+                      "pm.test(\"Cart Discounted Total is less than Cart Total \", () => {",
+                      "    response.products.forEach(product => {",
+                      "        pm.expect(product.discountedPrice).to.be.below(product.total);",
+                      "    })",
+                      "})",
+                      "",
+                      "//Validating product totalQuantity is equal to sum of all product quantity",
+                      "pm.test(\"Cart totalQuantity is equal to sum of all product quantity\", () => {",
+                      "",
+                      "             let productQty =0",
+                      "              response.products.forEach(product => {",
+                      "      ",
+                      "            productQty += product.quantity",
+                      "        })",
+                      "        pm.expect(response.totalQuantity).to.equal(productQty)",
+                      "    })",
+                      "",
+                      "",
+                      "",
+                      "//Validating totalProducts is equal to length of the product Array",
+                      "pm.test(\"Cart Total is equal to sum of products total\", () => ",
+                      "{",
+                      "pm.expect(response.products.length).to.equal(response.totalProducts)",
+                      "})",
+                      "",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"userId\": 2,\n    \"products\": [\n        {\n          \"id\": 144,\n         \"quantity\": 4\n        },\n        {\n        \"id\": 98,\n        \"quantity\": 1\n        }\n    ]\n} ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/add",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "add"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Product",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "const requestBody = JSON.parse(pm.request.body.raw);",
+                      "const cartId = Number(pm.request.url.toString().split(\"/\").pop());",
+                      "",
+                      "// Validate cart ID",
+                      "pm.test(\"Cart ID matches request URL\", () => {",
+                      "    pm.expect(response.id).to.equal(cartId);",
+                      "});",
+                      "",
+                      "// Validate products array",
+                      "pm.test(\"Products array is valid\", () => {",
+                      "    pm.expect(response.products).to.be.an('array').that.is.not.empty;",
+                      "});",
+                      "",
+                      "// Validate updated product exists",
+                      "pm.test(\"Updated product exists in response\", () => {",
+                      "    const updatedProduct = response.products.find(p => p.id === requestBody.products[0].id);",
+                      "    pm.expect(updatedProduct).to.exist;",
+                      "});",
+                      "",
+                      "// Validate quantity updated",
+                      "pm.test(\"Product quantity updated correctly\", () => {",
+                      "    const updatedProduct = response.products.find(p => p.id === requestBody.products[0].id);",
+                      "    pm.expect(updatedProduct.quantity).to.equal(requestBody.products[0].quantity);",
+                      "});",
+                      "",
+                      "// Validate product total logic",
+                      "pm.test(\"Product total equals price * quantity\", () => {",
+                      "    response.products.forEach(product => {",
+                      "        const expected = product.price * product.quantity;",
+                      "        pm.expect(product.total).to.be.closeTo(expected, 0.01);",
+                      "    });",
+                      "});",
+                      "",
+                      "// Validate cart total",
+                      "pm.test(\"Cart total equals sum of product totals\", () => {",
+                      "    let sum = 0;",
+                      "    response.products.forEach(product => sum += product.total);",
+                      "    pm.expect(response.total).to.be.closeTo(sum, 0.01);",
+                      "});",
+                      "",
+                      "// Validate discounted total",
+                      "pm.test(\"Cart discountedTotal is valid\", () => {",
+                      "    pm.expect(response.discountedTotal).to.be.at.most(response.total);",
+                      "});",
+                      "",
+                      "// Validate totalQuantity",
+                      "pm.test(\"Cart totalQuantity equals sum of product quantities\", () => {",
+                      "    let sum = 0;",
+                      "    response.products.forEach(product => sum += product.quantity);",
+                      "    pm.expect(response.totalQuantity).to.equal(sum);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"userId\": 2,\n    \"products\": [\n        {\n          \"id\": 144,\n         \"quantity\": 4\n        },\n        {\n        \"id\": 98,\n        \"quantity\": 45\n        }\n    ]\n} ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/7",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "7"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "const response = pm.response.json()",
+                      "",
+                      "pm.test(\"Response body contains the correct id\", () => ",
+                      "{",
+                      "    pm.expect(response.id).to.equal(1);",
+                      "",
+                      "});",
+                      "pm.test(\"Response body contains 'isDeleted': true\", () =>",
+                      " {",
+                      "pm.expect(response.isDeleted).to.be.true;",
+                      " });",
+                      " // Validate deletedOn field is a string and not empty.",
+                      "pm.test(\"Response contains deletedOn timestamp\", () => {",
+                      "    pm.expect(response).to.have.property('deletedOn');",
+                      "    pm.expect(response.deletedOn).to.be.a('string').that.is.not.empty;",
+                      "})"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/1",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Invalid Paths",
+          "item": [
+            {
+              "name": "Invalid cart ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 404\", () => {",
+                      "    pm.response.to.have.status(404);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "const cartId = pm.request.url.toString().split(\"/\").pop();",
+                      "",
+                      "// Validate message exists and is string",
+                      "pm.test(\"Response message is valid\", () => {",
+                      "    pm.expect(response).to.have.property(\"message\");",
+                      "    pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "// Validate message contains cart ID (dynamic)",
+                      "pm.test(\"Error message contains requested cart ID\", () => {",
+                      "    pm.expect(response.message).to.include(cartId);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/12345",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "12345"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Invalid userID-Add a new Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 404\", () => {",
+                      "    pm.response.to.have.status(404);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "const requestBody = JSON.parse(pm.request.body.raw);",
+                      "",
+                      "// Validate message structure",
+                      "pm.test(\"Response message is valid\", () => {",
+                      "    pm.expect(response).to.have.property(\"message\");",
+                      "    pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "// Validate error message dynamically",
+                      "pm.test(\"Error message contains invalid userId\", () => {",
+                      "    pm.expect(response.message).to.include(requestBody.userId.toString());",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"userId\": -1,\n    \"products\": [\n        {\n          \"id\": 144,\n         \"quantity\": 4\n        },\n        {\n        \"id\": 22,\n        \"quantity\": 1\n        }\n    ]\n} ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/add",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "add"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "No data -Add a new Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 400\", () => {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "const response = pm.response.json();",
+                      "",
+                      "// Validate message structure",
+                      "pm.test(\"Response message is valid\", () => {",
+                      "    pm.expect(response).to.have.property(\"message\");",
+                      "    pm.expect(response.message).to.be.a(\"string\").that.is.not.empty;",
+                      "});",
+                      "",
+                      "//validate error message",
+                      "pm.test(\"Error message is correct\", () => {",
+                      "    pm.expect(response.message).to.equal(\"User id is required\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "console.clear();"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{DbaseURL}}carts/add",
+                  "host": [
+                    "{{DbaseURL}}carts"
+                  ],
+                  "path": [
+                    "add"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "DbaseURL",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ]
+}
