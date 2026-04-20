@@ -225,22 +225,6 @@ Create a Postman environment with the following variables:
 2. Select your environment (`DbaseURL` must be set)
 3. Click **Run Dummy JSON API testing**
 
-### Via Newman (CLI)
-```bash
-# Install Newman globally
-npm install -g newman
-
-# Run with environment variable inline
-newman run "collections/Dummy JSON API testing.postman_collection.json" \
-  --env-var "DbaseURL=https://dummyjson.com/"
-
-# Run with a Postman environment file
-newman run "collections/Dummy JSON API testing.postman_collection.json" \
-  --environment environment.json
-```
-
----
-
 ## Folder Structure
 
 ```
