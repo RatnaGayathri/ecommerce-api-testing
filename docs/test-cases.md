@@ -1,6 +1,6 @@
 Test Cases – E-Commerce API (DummyJSON)
 Project: E-Commerce API Testing
- Tool: Postman
+Tool: Postman
  API Under Test:Dummy Json {{DbaseURL}}
  Test Types: Functional, Schema Validation, Business Logic, Negative Testing
 
