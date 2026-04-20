@@ -6,13 +6,14 @@ A comprehensive REST API test suite built with **Postman** for the [DummyJSON](h
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Test Summary](#test-summary)
-- [Modules & Test Coverage](#modules--test-coverage)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Running the Collection](#running-the-collection)
-- [Folder Structure](#folder-structure)
+* [Overview](#overview)
+* [Test Summary](#test-summary)
+* [Modules & Test Coverage](#modules--test-coverage)
+* [Getting Started](#getting-started)
+* [Environment Variables](#environment-variables)
+* [Running the Collection](#running-the-collection)
+* [Folder Structure](#folder-structure)
+* [Test Cases](docs/test-cases.md)        
 
 ---
 
@@ -231,6 +232,8 @@ Create a Postman environment with the following variables:
 ecommerce-api-testing/
 ├── collections/
 │   └── Dummy JSON API testing.postman_collection.json
+├── docs/
+│   └── test-cases.md
 └── README.md
 ```
 
