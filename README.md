@@ -1,4 +1,4 @@
-#  E-Commerce API Testing – Postman Collection
+# API Testing – Postman Collection
 
 A comprehensive REST API test suite built with **Postman** for the [DummyJSON](https://dummyjson.com/) API. This collection covers **functional**, **validation**, **negative**, and **edge-case** testing across Products and Carts modules, using JavaScript test scripts with the Postman `pm.*` API.
 
