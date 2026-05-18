@@ -30,7 +30,7 @@ A comprehensive REST API test suite built with **Postman** for the [DummyJSON](h
 
 | Module | Valid Path Tests | Invalid Path Tests | HTTP Methods |
 |--------|:---:|:---:|---|
-| **Products** | ✅ | ✅ | GET, POST, PUT, PATCH, DELETE |
+| **Products** | ✅ | ✅ | GET, POST,PATCH, DELETE |
 | **Carts** | ✅ | ✅ | GET, POST, PATCH, DELETE |
 
 ---
